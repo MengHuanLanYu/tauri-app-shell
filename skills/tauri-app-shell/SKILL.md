@@ -80,7 +80,22 @@ macOS 下执行 `pnpm tauri:dev:mac` 启动。
 
 ## 三、前端使用
 
-### 3.1 引入样式（入口文件，如 `main.tsx`）
+### 3.1 全局基础样式（必须）
+
+在全局 CSS 文件（如 `src/index.css`）中添加，缺少会导致白边或滚动条：
+
+```css
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+```
+
+### 3.2 引入组件样式（入口文件，如 `main.tsx`）
 
 ```tsx
 import 'tauri-app-shell/style';

@@ -75,7 +75,26 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
 
 ## 使用
 
-在入口文件引入样式（只需一次）：
+### 1. 全局基础样式（必须）
+
+在全局 CSS 文件（如 `src/index.css`）中添加，确保组件能铺满整个透明窗口：
+
+```css
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+}
+```
+
+> 缺少这段样式会导致窗口无法铺满、出现白边或滚动条。
+
+### 2. 引入组件样式（只需一次）
+
+在入口文件（如 `src/main.tsx`）中引入：
 
 ```tsx
 import 'tauri-app-shell/style';
