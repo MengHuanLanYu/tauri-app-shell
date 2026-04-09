@@ -1,0 +1,257 @@
+/**
+ * AppShell.css
+ *
+ * 所有尺寸和颜色均通过 CSS 变量暴露，接入方只需在父元素覆盖变量即可定制：
+ *
+ *   .app-shell {
+ *     --shell-sidebar-width:       240px;
+ *     --shell-right-panel-width:   300px;
+ *     --shell-titlebar-height:     40px;
+ *     --shell-traffic-spacer-w:    80px;   ← 跟随 trafficLightPosition.x 调整
+ *     --shell-sidebar-bg:          #f5f5f5;
+ *     --shell-main-bg:             #ffffff;
+ *     --shell-border-color:        rgba(0,0,0,0.08);
+ *     --shell-transition:          0.22s ease;
+ *   }
+ */
+
+/* ── 默认变量 ── */
+.app-shell {
+  --shell-sidebar-width:      220px;
+  --shell-right-panel-width:  260px;
+  --shell-titlebar-height:    36px;
+  /* traffic-spacer-w = trafficLightPosition.x(14) + 3灯×12 + 2间距×8 + 8呼吸 = 74px */
+  --shell-traffic-spacer-w:   74px;
+  --shell-sidebar-bg:         #ede8e3;
+  --shell-main-bg:            #ffffff;
+  --shell-border-color:       rgba(0, 0, 0, 0.07);
+  --shell-icon-color:         #3a3a3a;
+  --shell-icon-hover-bg:      rgba(0, 0, 0, 0.10);
+  --shell-transition:         0.22s ease;
+  --shell-radius:             12px;
+  --shell-shadow:             0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+/* ── 窗口外壳 ── */
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--shell-radius);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shell-shadow);
+}
+
+/* ── 标题栏：透明绝对浮层 ── */
+.app-shell__titlebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--shell-titlebar-height);
+  z-index: 100;
+  display: flex;
+  align-items: stretch;
+  background: transparent;
+  user-select: none;
+}
+
+/* 左区 */
+.app-shell__tb-left {
+  /* 有侧边栏时与侧边栏等宽；无侧边栏时 auto 紧包内容（仅 traffic-spacer + 任意插槽） */
+  width: var(--shell-sidebar-width);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  gap: 4px;
+  overflow: hidden;
+  transition: width var(--shell-transition);
+}
+
+/* 侧边栏收起：收缩到 spacer + 切换按钮的最小宽度 */
+.app-shell__tb-left--collapsed {
+  width: calc(12px + var(--shell-traffic-spacer-w) + 4px + 26px);
+}
+
+/* 无侧边栏（--shell-sidebar-width: 0px 时由 JS 内联设置）：auto 紧包内容 */
+.app-shell[style*="--shell-sidebar-width: 0px"] .app-shell__tb-left {
+  width: auto;
+}
+
+/* macOS 红绿灯占位，永不消失 */
+.app-shell__traffic-spacer {
+  width: var(--shell-traffic-spacer-w);
+  flex-shrink: 0;
+}
+
+/* 中间拖拽区 */
+.app-shell__tb-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* 右区 */
+.app-shell__tb-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  gap: 8px;
+  /* 有侧边栏时与侧边栏等宽，保持左右对称；无侧边栏时 auto */
+  width: var(--shell-sidebar-width, auto);
+  min-width: fit-content;
+}
+
+/* ── 图标按钮 ── */
+.app-shell__icon-btn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  background: transparent;
+  color: var(--shell-icon-color);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  box-shadow: none;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.app-shell__icon-btn:hover {
+  background: var(--shell-icon-hover-bg);
+  color: #000;
+}
+
+/* ── 非 Mac 窗口控制按钮 ── */
+.app-shell__win-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.app-shell__win-btn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.6);
+  color: #444;
+  cursor: pointer;
+  box-shadow: none;
+  outline: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.app-shell__win-btn:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.app-shell__win-btn--close:hover {
+  background: #e5534b;
+  border-color: #e5534b;
+  color: #fff;
+}
+
+/* ── 工作区 ── */
+.app-shell__workspace {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── 左侧边栏 ── */
+.app-shell__sidebar {
+  width: var(--shell-sidebar-width);
+  flex-shrink: 0;
+  background: var(--shell-sidebar-bg);
+  border-right: 1px solid var(--shell-border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: var(--shell-titlebar-height);
+  transition: width var(--shell-transition), border-color var(--shell-transition);
+}
+
+.app-shell__sidebar--collapsed {
+  width: 0;
+  border-right-color: transparent;
+}
+
+/* ── 主内容 ── */
+.app-shell__main {
+  flex: 1;
+  min-width: 0;
+  background: var(--shell-main-bg);
+  overflow: auto;
+  padding-top: var(--shell-titlebar-height);
+}
+
+/* ── 右侧面板 ── */
+.app-shell__right-panel {
+  width: var(--shell-right-panel-width);
+  flex-shrink: 0;
+  background: var(--shell-main-bg);
+  border-left: 1px solid var(--shell-border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: var(--shell-titlebar-height);
+  transition: width var(--shell-transition), border-color var(--shell-transition);
+}
+
+.app-shell__right-panel--collapsed {
+  width: 0;
+  border-left-color: transparent;
+}
+
+/* ── 深色模式 ── */
+@media (prefers-color-scheme: dark) {
+  .app-shell {
+    --shell-sidebar-bg:       #2a2520;
+    --shell-main-bg:          #ffffff;
+    --shell-border-color:     rgba(255, 255, 255, 0.07);
+    --shell-icon-color:       #c0c0c0;
+    --shell-icon-hover-bg:    rgba(255, 255, 255, 0.12);
+    --shell-shadow:           0 20px 60px rgba(0, 0, 0, 0.5);
+
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .app-shell__tb-center {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .app-shell__icon-btn:hover {
+    color: #fff;
+  }
+
+  .app-shell__win-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #bbb;
+  }
+
+  .app-shell__win-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
