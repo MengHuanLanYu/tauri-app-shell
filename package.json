@@ -23,7 +23,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "prepare": "pnpm build",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "release": "bash scripts/release.sh"
   },
   "peerDependencies": {
     "react": ">=18",

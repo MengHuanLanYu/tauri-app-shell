@@ -217,6 +217,34 @@ export default function App() {
 
 ---
 
+## 发版（维护者）
+
+使用内置发版脚本，自动完成：更新 `package.json` 版本号 → 构建 → commit → 打 Tag → 推送。
+
+```bash
+# 格式：pnpm release <版本号>
+pnpm release 0.2.0
+```
+
+脚本会自动校验：
+- 版本号格式是否正确（x.y.z）
+- 工作区是否有未提交的改动
+- Tag 是否已存在
+
+发版成功后，其他项目执行以下命令升级：
+
+```bash
+# 方式一：锁定版本（推荐）
+pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.2.0
+
+# 方式二：修改 package.json 中的版本后执行
+pnpm install
+```
+
+> **注意**：`#v0.1.0` 是 Git Tag，不是分支。必须通过发版脚本或手动 `git tag` 后才能使用指定版本安装。
+
+---
+
 ## peerDependencies
 
 | 包 | 版本 |
