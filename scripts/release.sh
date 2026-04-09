@@ -48,7 +48,12 @@ pnpm build
 
 # ── 提交 & 打 Tag ─────────────────────────────────────────
 git add package.json
-git commit -m "chore: release $TAG"
+# package.json 版本号与当前一致时跳过 commit，直接打 tag
+if git diff --cached --quiet; then
+  echo "ℹ️  package.json 版本号无变化，跳过 commit，直接打 Tag"
+else
+  git commit -m "chore: release $TAG"
+fi
 git tag "$TAG"
 
 echo "🚀 推送到远程..."
