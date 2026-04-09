@@ -156,13 +156,18 @@ function App() {
 
 ```css
 .app-shell {
-  --shell-sidebar-width:      240px;   /* 左侧栏宽度 */
-  --shell-right-panel-width:  300px;   /* 右面板宽度 */
-  --shell-titlebar-height:    40px;    /* 标题栏高度 */
-  --shell-traffic-spacer-w:   74px;    /* macOS 红绿灯占位宽 */
-  --shell-sidebar-bg:         #f0f0f0; /* 左侧背景色 */
-  --shell-main-bg:            #ffffff; /* 主区域背景色 */
-  --shell-right-panel-bg:     #ffffff; /* 右面板背景色 */
+  --shell-sidebar-width:      240px;                          /* 左侧栏宽度 */
+  --shell-right-panel-width:  300px;                          /* 右面板宽度 */
+  --shell-titlebar-height:    40px;                           /* 标题栏高度 */
+  --shell-traffic-spacer-w:   74px;                           /* macOS 红绿灯占位宽 */
+  --shell-sidebar-bg:         #f0f0f0;                        /* 左侧背景色 */
+  --shell-main-bg:            #ffffff;                        /* 主区域背景色 */
+  --shell-right-panel-bg:     #ffffff;                        /* 右面板背景色 */
+
+  /* 默认无圆角/阴影，适合 Tauri 全屏窗口直接填满。
+     需要浮动卡片效果时取消注释： */
+  /* --shell-radius: 12px; */
+  /* --shell-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); */
 }
 ```
 

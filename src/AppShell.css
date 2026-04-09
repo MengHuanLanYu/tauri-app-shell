@@ -12,6 +12,8 @@
  *     --shell-main-bg:             #ffffff;
  *     --shell-border-color:        rgba(0,0,0,0.08);
  *     --shell-transition:          0.22s ease;
+ *     --shell-radius:              0px;    ← 默认无圆角；浮动卡片效果设为 12px
+ *     --shell-shadow:              none;   ← 默认无阴影；浮动卡片效果设为需要的值
  *   }
  */
 
@@ -28,8 +30,12 @@
   --shell-icon-color:         #3a3a3a;
   --shell-icon-hover-bg:      rgba(0, 0, 0, 0.10);
   --shell-transition:         0.22s ease;
-  --shell-radius:             12px;
-  --shell-shadow:             0 20px 60px rgba(0, 0, 0, 0.25);
+  /* 以下两个变量默认关闭，适合 Tauri 全屏窗口直接填满；
+     如需浮动卡片效果，在父级覆盖：
+       --shell-radius: 12px;
+       --shell-shadow: 0 20px 60px rgba(0,0,0,0.25); */
+  --shell-radius:             0px;
+  --shell-shadow:             none;
 }
 
 /* ── 窗口外壳 ── */
@@ -41,7 +47,6 @@
   flex-direction: column;
   border-radius: var(--shell-radius);
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: var(--shell-shadow);
 }
 
@@ -232,9 +237,7 @@
     --shell-border-color:     rgba(255, 255, 255, 0.07);
     --shell-icon-color:       #c0c0c0;
     --shell-icon-hover-bg:    rgba(255, 255, 255, 0.12);
-    --shell-shadow:           0 20px 60px rgba(0, 0, 0, 0.5);
-
-    border-color: rgba(255, 255, 255, 0.1);
+    --shell-shadow:           none;
   }
 
   .app-shell__tb-center {
