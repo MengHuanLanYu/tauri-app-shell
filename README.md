@@ -12,13 +12,13 @@ Tauri 2.0 + React 透明自定义标题栏 + 弹性多列布局组件。
 ## 安装
 
 ```bash
-pnpm add git+https://github.com/luke12138-ai/tauri-app-shell.git
+pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git
 ```
 
 锁定版本（推荐生产环境）：
 
 ```bash
-pnpm add git+https://github.com/luke12138-ai/tauri-app-shell.git#v0.1.0
+pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
 ```
 
 ---
