@@ -2,7 +2,14 @@
   "name": "tauri-app-shell",
   "version": "0.1.0",
   "description": "Transparent custom titlebar + flexible multi-column layout shell for Tauri 2.0 + React",
-  "keywords": ["tauri", "tauri2", "react", "titlebar", "layout", "shell"],
+  "keywords": [
+    "tauri",
+    "tauri2",
+    "react",
+    "titlebar",
+    "layout",
+    "shell"
+  ],
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
