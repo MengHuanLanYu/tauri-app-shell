@@ -27,7 +27,8 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
 
 ### 1. 平台配置文件
 
-**`src-tauri/tauri.macos.conf.json`**
+`**src-tauri/tauri.macos.conf.json**`
+
 ```json
 {
   "app": {
@@ -35,13 +36,14 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
       "titleBarStyle": "Overlay",
       "hiddenTitle": true,
       "transparent": true,
-      "trafficLightPosition": { "x": 14, "y": 17 }
+      "trafficLightPosition": { "x": 14, "y": 16 }
     }]
   }
 }
 ```
 
-**`src-tauri/tauri.windows.conf.json`**
+`**src-tauri/tauri.windows.conf.json**`
+
 ```json
 {
   "app": {
@@ -50,7 +52,8 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
 }
 ```
 
-**`src-tauri/tauri.linux.conf.json`**
+`**src-tauri/tauri.linux.conf.json**`
+
 ```json
 {
   "app": {
@@ -61,7 +64,8 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
 
 ### 2. 开启拖拽权限
 
-**`src-tauri/capabilities/default.json`**
+`**src-tauri/capabilities/default.json**`
+
 ```json
 {
   "permissions": [
@@ -231,18 +235,20 @@ export default function App() {
 
 ## Props
 
-| Prop | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `children` | `ReactNode` | 必填 | 主内容区 |
-| `sidebar` | `ReactNode` | — | 左侧边栏；不传则不渲染 |
-| `rightPanel` | `ReactNode` | — | 右侧面板；不传则不渲染 |
-| `sidebarToggle` | `ReactNode \| false` | `undefined` | `undefined` 有 sidebar 时显示默认按钮；`false` 隐藏；传节点则替换 |
-| `rightPanelToggle` | `ReactNode \| false` | `undefined` | 同上，控制右侧面板切换按钮 |
-| `titlebarLeft` | `ReactNode` | — | 标题栏左侧额外内容（sidebarToggle 之后） |
-| `titlebarCenter` | `ReactNode` | — | 标题栏中间（可拖拽区域内） |
-| `titlebarRight` | `ReactNode` | — | 标题栏右侧额外内容（rightPanelToggle 之前） |
-| `defaultSidebarOpen` | `boolean` | `true` | 侧边栏初始展开状态 |
-| `defaultRightPanelOpen` | `boolean` | `true` | 右侧面板初始展开状态 |
+
+| Prop                    | 类型                  | 默认值         | 说明                                              |
+| ----------------------- | ------------------- | ----------- | ----------------------------------------------- |
+| `children`              | `ReactNode`         | 必填          | 主内容区                                            |
+| `sidebar`               | `ReactNode`         | —           | 左侧边栏；不传则不渲染                                     |
+| `rightPanel`            | `ReactNode`         | —           | 右侧面板；不传则不渲染                                     |
+| `sidebarToggle`         | `ReactNode | false` | `undefined` | `undefined` 有 sidebar 时显示默认按钮；`false` 隐藏；传节点则替换 |
+| `rightPanelToggle`      | `ReactNode | false` | `undefined` | 同上，控制右侧面板切换按钮                                   |
+| `titlebarLeft`          | `ReactNode`         | —           | 标题栏左侧额外内容（sidebarToggle 之后）                     |
+| `titlebarCenter`        | `ReactNode`         | —           | 标题栏中间（可拖拽区域内）                                   |
+| `titlebarRight`         | `ReactNode`         | —           | 标题栏右侧额外内容（rightPanelToggle 之前）                  |
+| `defaultSidebarOpen`    | `boolean`           | `true`      | 侧边栏初始展开状态                                       |
+| `defaultRightPanelOpen` | `boolean`           | `true`      | 右侧面板初始展开状态                                      |
+
 
 ---
 
@@ -276,6 +282,7 @@ pnpm release 0.2.0
 ```
 
 脚本会自动校验：
+
 - 版本号格式是否正确（x.y.z）
 - 工作区是否有未提交的改动
 - Tag 是否已存在
@@ -296,9 +303,12 @@ pnpm install
 
 ## peerDependencies
 
-| 包 | 版本 |
-|----|------|
-| `react` | `>=18` |
-| `react-dom` | `>=18` |
-| `@tauri-apps/api` | `>=2` |
-| `lucide-react` | `>=0.300.0` |
+
+| 包                 | 版本          |
+| ----------------- | ----------- |
+| `react`           | `>=18`      |
+| `react-dom`       | `>=18`      |
+| `@tauri-apps/api` | `>=2`       |
+| `lucide-react`    | `>=0.300.0` |
+
+

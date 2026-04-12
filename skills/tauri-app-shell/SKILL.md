@@ -1,7 +1,7 @@
 ---
-name: tauri-app-shell
+
+## name: tauri-app-shell
 description: 在 Tauri 2.0 + React 项目中安装和配置 tauri-app-shell 组件，实现自定义透明标题栏、多栏布局（左侧边栏 + 主区域 + 右面板）、macOS 红绿灯对齐、跨平台窗口配置。适用于接入 AppShell、配置自定义标题栏、安装 tauri-app-shell、实现多栏布局、设置透明窗口等场景。
----
 
 # tauri-app-shell 快速接入
 
@@ -30,7 +30,8 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#<version>
 
 ### 2.2 平台配置文件
 
-**`src-tauri/tauri.conf.json`**（公共基础，去掉 transparent/decorations 等平台相关字段）：
+`**src-tauri/tauri.conf.json**`（公共基础，去掉 transparent/decorations 等平台相关字段）：
+
 ```json
 {
   "app": {
@@ -39,23 +40,26 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#<version>
 }
 ```
 
-**`src-tauri/tauri.macos.conf.json`**：
+`**src-tauri/tauri.macos.conf.json**`：
+
 ```json
 {
   "app": {
-    "windows": [{ "titleBarStyle": "Overlay", "hiddenTitle": true, "transparent": true, "trafficLightPosition": { "x": 14, "y": 17 } }]
+    "windows": [{ "titleBarStyle": "Overlay", "hiddenTitle": true, "transparent": true, "trafficLightPosition": { "x": 14, "y": 16 } }]
   }
 }
 ```
 
-**`src-tauri/tauri.windows.conf.json`**：
+`**src-tauri/tauri.windows.conf.json**`：
+
 ```json
 {
   "app": { "windows": [{ "decorations": false, "transparent": true }] }
 }
 ```
 
-**`src-tauri/tauri.linux.conf.json`**：
+`**src-tauri/tauri.linux.conf.json**`：
+
 ```json
 {
   "app": { "windows": [{ "decorations": false, "transparent": false }] }
@@ -168,18 +172,20 @@ function App() {
 
 ## 四、Props 速查
 
-| Prop | 类型 | 默认 | 说明 |
-|------|------|------|------|
-| `children` | ReactNode | — | 主内容区（必填） |
-| `sidebar` | ReactNode | — | 左侧边栏 |
-| `rightPanel` | ReactNode | — | 右面板 |
-| `sidebarToggle` | ReactNode \| false | 默认按钮 | false = 不显示 |
-| `rightPanelToggle` | ReactNode \| false | 默认按钮 | false = 不显示 |
-| `titlebarLeft` | ReactNode | — | 标题栏左区（红绿灯之后） |
-| `titlebarCenter` | ReactNode | — | 标题栏中区 |
-| `titlebarRight` | ReactNode | — | 标题栏右区 |
-| `defaultSidebarOpen` | boolean | true | 初始侧边栏状态 |
-| `defaultRightPanelOpen` | boolean | true | 初始右面板状态 |
+
+| Prop                    | 类型                | 默认   | 说明           |
+| ----------------------- | ----------------- | ---- | ------------ |
+| `children`              | ReactNode         | —    | 主内容区（必填）     |
+| `sidebar`               | ReactNode         | —    | 左侧边栏         |
+| `rightPanel`            | ReactNode         | —    | 右面板          |
+| `sidebarToggle`         | ReactNode | false | 默认按钮 | false = 不显示  |
+| `rightPanelToggle`      | ReactNode | false | 默认按钮 | false = 不显示  |
+| `titlebarLeft`          | ReactNode         | —    | 标题栏左区（红绿灯之后） |
+| `titlebarCenter`        | ReactNode         | —    | 标题栏中区        |
+| `titlebarRight`         | ReactNode         | —    | 标题栏右区        |
+| `defaultSidebarOpen`    | boolean           | true | 初始侧边栏状态      |
+| `defaultRightPanelOpen` | boolean           | true | 初始右面板状态      |
+
 
 ---
 
