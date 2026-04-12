@@ -183,7 +183,36 @@ function App() {
 
 ---
 
-## 五、CSS 变量定制
+## 五、主题切换
+
+AppShell 默认跟随系统 `prefers-color-scheme`。如需手动切换，在 `<html>` 上设置 `data-theme` 属性即可：
+
+```ts
+// 切换到深色
+document.documentElement.setAttribute('data-theme', 'dark');
+
+// 切换到浅色
+document.documentElement.setAttribute('data-theme', 'light');
+
+// 移除后恢复跟随系统
+document.documentElement.removeAttribute('data-theme');
+```
+
+React 中典型用法：
+
+```tsx
+const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+useEffect(() => {
+  document.documentElement.setAttribute('data-theme', theme);
+}, [theme]);
+```
+
+> 不需要手动切换的项目无需关心此属性，组件默认跟随系统。
+
+---
+
+## 六、CSS 变量定制
 
 在全局 CSS 中覆盖（`.app-shell` 作用域）：
 
