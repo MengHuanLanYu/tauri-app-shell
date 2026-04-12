@@ -307,15 +307,6 @@
     --shell-shadow:           none;
   }
 
-  /* 深色：sidebar handle 两侧色差过大，用 border-color 显示细线代替颜色过渡 */
-  .app-shell__resize-handle--sidebar {
-    background: var(--shell-main-bg);
-  }
-
-  .app-shell__resize-handle--sidebar::after {
-    background: var(--shell-border-color);
-  }
-
   .app-shell__tb-center { color: rgba(255, 255, 255, 0.45); }
   .app-shell__icon-btn:hover { color: #ffffff; }
 
@@ -338,14 +329,6 @@ html[data-theme="dark"] .app-shell {
   --shell-icon-color:       #d0d0d0;
   --shell-icon-hover-bg:    rgba(255, 255, 255, 0.12);
   --shell-shadow:           none;
-}
-
-html[data-theme="dark"] .app-shell__resize-handle--sidebar {
-  background: var(--shell-main-bg);
-}
-
-html[data-theme="dark"] .app-shell__resize-handle--sidebar::after {
-  background: var(--shell-border-color);
 }
 
 html[data-theme="dark"] .app-shell__tb-center { color: rgba(255, 255, 255, 0.45); }
