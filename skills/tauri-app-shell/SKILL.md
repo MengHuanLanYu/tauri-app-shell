@@ -78,6 +78,24 @@ macOS 下执行 `pnpm tauri:dev:mac` 启动。
 
 ---
 
+## 重要约束
+
+`AppShell` 必须是应用最外层根组件，外层不允许再套任何组件或 DOM 元素，否则会破坏铺满逻辑导致白边或透明窗口失效。
+
+```tsx
+// ✅ 正确
+export default function App() {
+  return <AppShell>...</AppShell>;
+}
+
+// ❌ 错误
+export default function App() {
+  return <div className="wrapper"><AppShell>...</AppShell></div>;
+}
+```
+
+---
+
 ## 三、前端使用
 
 ### 3.1 全局基础样式（必须）

@@ -73,6 +73,36 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
 
 ---
 
+## 重要约束
+
+`AppShell` 必须作为应用的**最外层根组件**直接渲染，外层不允许再包裹任何其他组件或 DOM 元素。
+
+```tsx
+// ✅ 正确
+export default function App() {
+  return (
+    <AppShell>
+      ...
+    </AppShell>
+  );
+}
+
+// ❌ 错误 —— AppShell 外层有包裹元素
+export default function App() {
+  return (
+    <div className="wrapper">
+      <AppShell>
+        ...
+      </AppShell>
+    </div>
+  );
+}
+```
+
+> 外层包裹元素会破坏 `width: 100% / height: 100%` 的铺满逻辑，导致白边、布局错位或透明窗口失效。
+
+---
+
 ## 使用
 
 ### 1. 全局基础样式（必须）
