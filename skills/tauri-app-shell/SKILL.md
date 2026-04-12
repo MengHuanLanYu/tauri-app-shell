@@ -2,6 +2,7 @@
 
 ## name: tauri-app-shell
 description: 在 Tauri 2.0 + React 项目中安装和配置 tauri-app-shell 组件，实现自定义透明标题栏、多栏布局（左侧边栏 + 主区域 + 右面板）、macOS 红绿灯对齐、跨平台窗口配置。适用于接入 AppShell、配置自定义标题栏、安装 tauri-app-shell、实现多栏布局、设置透明窗口等场景。
+---
 
 # tauri-app-shell 快速接入
 
