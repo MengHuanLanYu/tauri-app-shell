@@ -24,7 +24,8 @@
   --shell-titlebar-height:    36px;
   /* traffic-spacer-w = trafficLightPosition.x(14) + 3灯×12 + 2间距×8 + 8呼吸 = 74px */
   --shell-traffic-spacer-w:   74px;
-  --shell-sidebar-bg:         #ede8e3;
+  --shell-sidebar-bg:         #f3f3f3;
+  --shell-sidebar-color:      #3a3c3e;
   --shell-main-bg:            #ffffff;
   --shell-border-color:       rgba(0, 0, 0, 0.07);
   --shell-icon-color:         #3a3a3a;
@@ -189,6 +190,7 @@
   width: var(--shell-sidebar-width);
   flex-shrink: 0;
   background: var(--shell-sidebar-bg);
+  color: var(--shell-sidebar-color);
   border-right: 1px solid var(--shell-border-color);
   display: flex;
   flex-direction: column;
@@ -233,6 +235,7 @@
 @media (prefers-color-scheme: dark) {
   .app-shell {
     --shell-sidebar-bg:       #2a2520;
+    --shell-sidebar-color:    #c8cacc;
     --shell-main-bg:          #ffffff;
     --shell-border-color:     rgba(255, 255, 255, 0.07);
     --shell-icon-color:       #c0c0c0;
