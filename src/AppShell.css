@@ -52,6 +52,12 @@
   box-shadow: var(--shell-shadow);
 }
 
+/* 拖拽分隔条时禁止全局文字选中 */
+.app-shell--dragging {
+  user-select: none;
+  cursor: col-resize;
+}
+
 /* ── 标题栏：透明绝对浮层 ── */
 .app-shell__titlebar {
   position: absolute;
@@ -192,17 +198,45 @@
   flex-shrink: 0;
   background: var(--shell-sidebar-bg);
   color: var(--shell-sidebar-color);
-  border-right: 1px solid var(--shell-border-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   padding-top: var(--shell-titlebar-height);
-  transition: width var(--shell-transition), border-color var(--shell-transition);
+  transition: width var(--shell-transition);
 }
 
 .app-shell__sidebar--collapsed {
   width: 0;
-  border-right-color: transparent;
+}
+
+/* ── 拖拽分隔条 ── */
+.app-shell__resize-handle {
+  flex-shrink: 0;
+  width: 5px;
+  cursor: col-resize;
+  position: relative;
+  z-index: 10;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+/* 细线居中显示 */
+.app-shell__resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 2px;
+  width: 1px;
+  background: var(--shell-border-color);
+  transition: background 0.15s, left 0.15s, width 0.15s;
+}
+
+.app-shell__resize-handle:hover::after,
+.app-shell--dragging .app-shell__resize-handle::after {
+  left: 1px;
+  width: 3px;
+  background: rgba(100, 130, 255, 0.5);
 }
 
 /* ── 主内容 ── */
@@ -221,17 +255,15 @@
   flex-shrink: 0;
   background: var(--shell-main-bg);
   color: var(--shell-main-color);
-  border-left: 1px solid var(--shell-border-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   padding-top: var(--shell-titlebar-height);
-  transition: width var(--shell-transition), border-color var(--shell-transition);
+  transition: width var(--shell-transition);
 }
 
 .app-shell__right-panel--collapsed {
   width: 0;
-  border-left-color: transparent;
 }
 
 /* ── 深色模式：跟随系统 或 html[data-theme="dark"] ── */

@@ -1,9 +1,15 @@
 /** Tauri 2.0 透明自定义标题栏 + 弹性多列布局。详见 README。 */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { PanelLeft, PanelRight, Minus, Square, Minimize2, X } from 'lucide-react';
 import './AppShell.css';
+
+// ── 拖拽约束默认值 ────────────────────────────────────────
+const SIDEBAR_MIN = 140;
+const SIDEBAR_MAX = 480;
+const RIGHT_PANEL_MIN = 160;
+const RIGHT_PANEL_MAX = 520;
 
 // ── Props ────────────────────────────────────────────────
 
@@ -43,12 +49,21 @@ export interface AppShellProps {
   defaultSidebarOpen?: boolean;
   /** 右侧面板初始展开状态，默认 true */
   defaultRightPanelOpen?: boolean;
+  /** 侧边栏初始宽度 px，默认 220 */
+  defaultSidebarWidth?: number;
+  /** 侧边栏最小宽度 px，默认 140 */
+  sidebarMinWidth?: number;
+  /** 侧边栏最大宽度 px，默认 480 */
+  sidebarMaxWidth?: number;
+  /** 右侧面板初始宽度 px，默认 260 */
+  defaultRightPanelWidth?: number;
+  /** 右侧面板最小宽度 px，默认 160 */
+  rightPanelMinWidth?: number;
+  /** 右侧面板最大宽度 px，默认 520 */
+  rightPanelMaxWidth?: number;
 }
 
 // ── 辅助：解析 toggle 插槽值 ─────────────────────────────
-// undefined + hasPannel → 渲染默认按钮
-// false                 → 不渲染
-// ReactNode             → 渲染自定义内容
 function resolveToggle(
   prop: React.ReactNode | false | undefined,
   hasPanel: boolean,
@@ -72,12 +87,27 @@ export function AppShell({
   titlebarRight,
   defaultSidebarOpen = true,
   defaultRightPanelOpen = true,
+  defaultSidebarWidth = 220,
+  sidebarMinWidth = SIDEBAR_MIN,
+  sidebarMaxWidth = SIDEBAR_MAX,
+  defaultRightPanelWidth = 260,
+  rightPanelMinWidth = RIGHT_PANEL_MIN,
+  rightPanelMaxWidth = RIGHT_PANEL_MAX,
 }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
   const [rightPanelOpen, setRightPanelOpen] = useState(defaultRightPanelOpen);
   const [isMaximized, setIsMaximized] = useState(false);
-  const isMac = /mac/i.test(navigator.userAgent);
+  const [sidebarWidth, setSidebarWidth] = useState(defaultSidebarWidth);
+  const [rightPanelWidth, setRightPanelWidth] = useState(defaultRightPanelWidth);
+  const [isDragging, setIsDragging] = useState(false);
 
+  const dragRef = useRef<{
+    type: 'sidebar' | 'right';
+    startX: number;
+    startWidth: number;
+  } | null>(null);
+
+  const isMac = /mac/i.test(navigator.userAgent);
   const hasSidebar = sidebar !== undefined;
   const hasRightPanel = rightPanel !== undefined;
 
@@ -88,6 +118,40 @@ export function AppShell({
     setIsMaximized(await win.isMaximized());
   }
   async function close() { await getCurrentWindow().close(); }
+
+  // ── 拖拽逻辑 ──────────────────────────────────────────
+  function startDrag(type: 'sidebar' | 'right', e: React.MouseEvent) {
+    e.preventDefault();
+    dragRef.current = {
+      type,
+      startX: e.clientX,
+      startWidth: type === 'sidebar' ? sidebarWidth : rightPanelWidth,
+    };
+    setIsDragging(true);
+
+    function onMove(e: MouseEvent) {
+      if (!dragRef.current) return;
+      const delta = e.clientX - dragRef.current.startX;
+      if (dragRef.current.type === 'sidebar') {
+        const w = Math.min(Math.max(dragRef.current.startWidth + delta, sidebarMinWidth), sidebarMaxWidth);
+        setSidebarWidth(w);
+      } else {
+        // 右面板：往左拖 delta 为负，宽度应增加
+        const w = Math.min(Math.max(dragRef.current.startWidth - delta, rightPanelMinWidth), rightPanelMaxWidth);
+        setRightPanelWidth(w);
+      }
+    }
+
+    function onUp() {
+      dragRef.current = null;
+      setIsDragging(false);
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
 
   // 解析两个 toggle 插槽
   const resolvedSidebarToggle = resolveToggle(
@@ -116,22 +180,26 @@ export function AppShell({
     </button>,
   );
 
-  // 左区是否需要渲染
   const showTbLeft = isMac || !!resolvedSidebarToggle || !!titlebarLeft;
-  // 右区是否需要渲染
   const showTbRight = !isMac || !!resolvedRightPanelToggle || !!titlebarRight;
 
   return (
     <div
-      className="app-shell"
-      style={hasSidebar ? undefined : { '--shell-sidebar-width': '0px' } as React.CSSProperties}
+      className={['app-shell', isDragging ? 'app-shell--dragging' : ''].join(' ')}
+      style={
+        {
+          '--shell-sidebar-width': hasSidebar ? `${sidebarWidth}px` : '0px',
+          '--shell-right-panel-width': `${rightPanelWidth}px`,
+          '--shell-radius': 'var(--shell-radius, 0px)',
+          '--shell-shadow': 'var(--shell-shadow, none)',
+        } as React.CSSProperties
+      }
     >
       {/* ── 标题栏 ── */}
       <header
         className={['app-shell__titlebar', isMac ? 'app-shell__titlebar--mac' : ''].join(' ')}
         data-tauri-drag-region
       >
-        {/* 左区 */}
         {showTbLeft && (
           <div
             className={[
@@ -146,12 +214,10 @@ export function AppShell({
           </div>
         )}
 
-        {/* 中间拖拽区 */}
         <div className="app-shell__tb-center" data-tauri-drag-region>
           {titlebarCenter}
         </div>
 
-        {/* 右区 */}
         {showTbRight && (
           <div className="app-shell__tb-right">
             {titlebarRight}
@@ -173,19 +239,44 @@ export function AppShell({
         )}
       </header>
 
-      {/* ── 工作区 ── */}
+      {/* ── 工作区 ──
+           规则：每个面板（除最后一个可见面板）的右侧都有拖拽把手。
+           可见顺序：[sidebar?] → [main] → [rightPanel?]
+           main 始终 flex:1 吸收剩余空间，只需为两侧固定宽度面板提供把手。
+      ── */}
       <div className="app-shell__workspace">
+
+        {/* 侧边栏（若存在） + 右侧拖拽把手 */}
         {hasSidebar && (
           <aside className={`app-shell__sidebar ${sidebarOpen ? '' : 'app-shell__sidebar--collapsed'}`}>
             {sidebar}
           </aside>
         )}
+        {/* 把手：sidebar 不是最后一个面板，始终渲染；collapsed 时隐藏 */}
+        {hasSidebar && sidebarOpen && (
+          <div
+            className="app-shell__resize-handle"
+            onMouseDown={(e) => startDrag('sidebar', e)}
+          />
+        )}
+
+        {/* 主内容区（始终存在，flex:1，无固定宽度，无右侧把手） */}
         <main className="app-shell__main">{children}</main>
+
+        {/* 把手：main 不是最后一个面板（rightPanel 存在时）；collapsed 时隐藏 */}
+        {hasRightPanel && rightPanelOpen && (
+          <div
+            className="app-shell__resize-handle"
+            onMouseDown={(e) => startDrag('right', e)}
+          />
+        )}
+        {/* 右面板（若存在）：最后一个面板，右侧无把手 */}
         {hasRightPanel && (
           <aside className={`app-shell__right-panel ${rightPanelOpen ? '' : 'app-shell__right-panel--collapsed'}`}>
             {rightPanel}
           </aside>
         )}
+
       </div>
     </div>
   );
