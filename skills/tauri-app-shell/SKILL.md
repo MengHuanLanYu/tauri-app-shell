@@ -123,7 +123,7 @@ html, body, #root {
 import 'tauri-app-shell/style';
 ```
 
-### 3.2 最简用法（三栏）
+### 3.3 最简用法（三栏）
 
 ```tsx
 import { AppShell } from 'tauri-app-shell';
@@ -140,7 +140,7 @@ function App() {
 }
 ```
 
-### 3.3 双栏（隐藏右面板）
+### 3.4 双栏（隐藏右面板）
 
 ```tsx
 <AppShell sidebar={<Sidebar />}>
@@ -148,13 +148,13 @@ function App() {
 </AppShell>
 ```
 
-### 3.4 纯主区域（无侧边栏）
+### 3.5 纯主区域（无侧边栏）
 
 ```tsx
 <AppShell>{/* 主内容 */}</AppShell>
 ```
 
-### 3.5 自定义标题栏内容
+### 3.6 自定义标题栏内容
 
 ```tsx
 <AppShell
@@ -172,19 +172,24 @@ function App() {
 
 ## 四、Props 速查
 
-
-| Prop                    | 类型                | 默认   | 说明           |
-| ----------------------- | ----------------- | ---- | ------------ |
-| `children`              | ReactNode         | —    | 主内容区（必填）     |
-| `sidebar`               | ReactNode         | —    | 左侧边栏         |
-| `rightPanel`            | ReactNode         | —    | 右面板          |
-| `sidebarToggle`         | ReactNode | false | 默认按钮 | false = 不显示  |
-| `rightPanelToggle`      | ReactNode | false | 默认按钮 | false = 不显示  |
-| `titlebarLeft`          | ReactNode         | —    | 标题栏左区（红绿灯之后） |
-| `titlebarCenter`        | ReactNode         | —    | 标题栏中区        |
-| `titlebarRight`         | ReactNode         | —    | 标题栏右区        |
-| `defaultSidebarOpen`    | boolean           | true | 初始侧边栏状态      |
-| `defaultRightPanelOpen` | boolean           | true | 初始右面板状态      |
+| Prop                     | 类型                   | 默认    | 说明                              |
+| ------------------------ | -------------------- | ----- | ------------------------------- |
+| `children`               | ReactNode            | —     | 主内容区（必填）                        |
+| `sidebar`                | ReactNode            | —     | 左侧边栏                            |
+| `rightPanel`             | ReactNode            | —     | 右面板                             |
+| `sidebarToggle`          | ReactNode \| false   | 默认按钮  | false = 不显示；传节点 = 自定义            |
+| `rightPanelToggle`       | ReactNode \| false   | 默认按钮  | 同上                              |
+| `titlebarLeft`           | ReactNode            | —     | 标题栏左区（红绿灯之后）                    |
+| `titlebarCenter`         | ReactNode            | —     | 标题栏中区                           |
+| `titlebarRight`          | ReactNode            | —     | 标题栏右区                           |
+| `defaultSidebarOpen`     | boolean              | true  | 初始侧边栏状态                         |
+| `defaultRightPanelOpen`  | boolean              | true  | 初始右面板状态                         |
+| `defaultSidebarWidth`    | number               | 220   | 侧边栏初始宽度（px）                     |
+| `sidebarMinWidth`        | number               | 140   | 侧边栏拖拽最小宽度（px）                   |
+| `sidebarMaxWidth`        | number               | 480   | 侧边栏拖拽最大宽度（px）                   |
+| `defaultRightPanelWidth` | number               | 260   | 右面板初始宽度（px）                     |
+| `rightPanelMinWidth`     | number               | 160   | 右面板拖拽最小宽度（px）                   |
+| `rightPanelMaxWidth`     | number               | 520   | 右面板拖拽最大宽度（px）                   |
 
 
 ---
@@ -224,16 +229,18 @@ useEffect(() => {
 
 ```css
 .app-shell {
-  --shell-sidebar-width:      240px;                          /* 左侧栏宽度 */
-  --shell-right-panel-width:  300px;                          /* 右面板宽度 */
-  --shell-titlebar-height:    40px;                           /* 标题栏高度 */
-  --shell-traffic-spacer-w:   74px;                           /* macOS 红绿灯占位宽 */
-  --shell-sidebar-bg:         #f0f0f0;                        /* 左侧背景色 */
-  --shell-main-bg:            #ffffff;                        /* 主区域背景色 */
-  --shell-right-panel-bg:     #ffffff;                        /* 右面板背景色 */
-
-  /* 默认无圆角/阴影，适合 Tauri 全屏窗口直接填满。
-     需要浮动卡片效果时取消注释： */
+  --shell-sidebar-width:      220px;    /* 侧边栏宽度（拖拽时自动更新） */
+  --shell-right-panel-width:  260px;    /* 右面板宽度（拖拽时自动更新） */
+  --shell-titlebar-height:    36px;     /* 标题栏高度 */
+  --shell-traffic-spacer-w:   74px;     /* macOS 红绿灯占位宽 */
+  --shell-sidebar-bg:         #f3f3f3;  /* 侧边栏背景色 */
+  --shell-sidebar-color:      #3a3c3e;  /* 侧边栏文字色 */
+  --shell-main-bg:            #ffffff;  /* 主内容区 / 右面板背景色 */
+  --shell-main-color:         #1a1a1a;  /* 主内容区 / 右面板文字色 */
+  --shell-border-color:       rgba(0, 0, 0, 0.07);
+  --shell-icon-color:         #3a3a3a;
+  --shell-transition:         0.22s ease;
+  /* 默认无圆角/阴影；需要浮动卡片效果时启用： */
   /* --shell-radius: 12px; */
   /* --shell-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); */
 }

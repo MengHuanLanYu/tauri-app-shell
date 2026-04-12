@@ -4,8 +4,9 @@ Tauri 2.0 + React 透明自定义标题栏 + 弹性多列布局组件。
 
 - 透明窗口，标题栏颜色与下方内容列自然连续
 - macOS 保留原生红绿灯，Windows / Linux 自绘窗口控制按钮
-- 支持单栏 / 两栏 / 三栏，侧边栏和右侧面板均可折叠动画
+- 支持单栏 / 两栏 / 三栏，侧边栏和右侧面板均可折叠、可拖拽调整宽度
 - 所有标题栏区域均为插槽，完全自定义
+- 内置浅色 / 深色主题，支持跟随系统或手动切换
 
 ---
 
@@ -236,18 +237,24 @@ export default function App() {
 ## Props
 
 
-| Prop                    | 类型                  | 默认值         | 说明                                              |
-| ----------------------- | ------------------- | ----------- | ----------------------------------------------- |
-| `children`              | `ReactNode`         | 必填          | 主内容区                                            |
-| `sidebar`               | `ReactNode`         | —           | 左侧边栏；不传则不渲染                                     |
-| `rightPanel`            | `ReactNode`         | —           | 右侧面板；不传则不渲染                                     |
-| `sidebarToggle`         | `ReactNode | false` | `undefined` | `undefined` 有 sidebar 时显示默认按钮；`false` 隐藏；传节点则替换 |
-| `rightPanelToggle`      | `ReactNode | false` | `undefined` | 同上，控制右侧面板切换按钮                                   |
-| `titlebarLeft`          | `ReactNode`         | —           | 标题栏左侧额外内容（sidebarToggle 之后）                     |
-| `titlebarCenter`        | `ReactNode`         | —           | 标题栏中间（可拖拽区域内）                                   |
-| `titlebarRight`         | `ReactNode`         | —           | 标题栏右侧额外内容（rightPanelToggle 之前）                  |
-| `defaultSidebarOpen`    | `boolean`           | `true`      | 侧边栏初始展开状态                                       |
-| `defaultRightPanelOpen` | `boolean`           | `true`      | 右侧面板初始展开状态                                      |
+| Prop                     | 类型                  | 默认值         | 说明                                              |
+| ------------------------ | ------------------- | ----------- | ----------------------------------------------- |
+| `children`               | `ReactNode`         | 必填          | 主内容区                                            |
+| `sidebar`                | `ReactNode`         | —           | 左侧边栏；不传则不渲染                                     |
+| `rightPanel`             | `ReactNode`         | —           | 右侧面板；不传则不渲染                                     |
+| `sidebarToggle`          | `ReactNode \| false` | `undefined` | `undefined` 有 sidebar 时显示默认按钮；`false` 隐藏；传节点则替换 |
+| `rightPanelToggle`       | `ReactNode \| false` | `undefined` | 同上，控制右侧面板切换按钮                                   |
+| `titlebarLeft`           | `ReactNode`         | —           | 标题栏左侧额外内容（sidebarToggle 之后）                     |
+| `titlebarCenter`         | `ReactNode`         | —           | 标题栏中间（可拖拽区域内）                                   |
+| `titlebarRight`          | `ReactNode`         | —           | 标题栏右侧额外内容（rightPanelToggle 之前）                  |
+| `defaultSidebarOpen`     | `boolean`           | `true`      | 侧边栏初始展开状态                                       |
+| `defaultRightPanelOpen`  | `boolean`           | `true`      | 右侧面板初始展开状态                                      |
+| `defaultSidebarWidth`    | `number`            | `220`       | 侧边栏初始宽度（px）                                     |
+| `sidebarMinWidth`        | `number`            | `140`       | 侧边栏拖拽最小宽度（px）                                   |
+| `sidebarMaxWidth`        | `number`            | `480`       | 侧边栏拖拽最大宽度（px）                                   |
+| `defaultRightPanelWidth` | `number`            | `260`       | 右侧面板初始宽度（px）                                    |
+| `rightPanelMinWidth`     | `number`            | `160`       | 右侧面板拖拽最小宽度（px）                                  |
+| `rightPanelMaxWidth`     | `number`            | `520`       | 右侧面板拖拽最大宽度（px）                                  |
 
 
 ---
@@ -258,15 +265,21 @@ export default function App() {
 
 ```css
 .app-shell {
-  --shell-sidebar-width:      220px;
-  --shell-right-panel-width:  260px;
-  --shell-titlebar-height:    36px;
-  /* 跟随 trafficLightPosition.x 调整，使按钮紧贴红绿灯右侧 */
-  --shell-traffic-spacer-w:   74px;
-  --shell-sidebar-bg:         #ede8e3;
-  --shell-main-bg:            #ffffff;
-  --shell-border-color:       rgba(0, 0, 0, 0.07);
+  --shell-sidebar-width:      220px;    /* 侧边栏宽度（拖拽时自动更新） */
+  --shell-right-panel-width:  260px;    /* 右面板宽度（拖拽时自动更新） */
+  --shell-titlebar-height:    36px;     /* 标题栏高度 */
+  --shell-traffic-spacer-w:   74px;     /* macOS 红绿灯占位宽，跟随 trafficLightPosition.x */
+  --shell-sidebar-bg:         #f3f3f3;  /* 侧边栏背景色 */
+  --shell-sidebar-color:      #3a3c3e;  /* 侧边栏文字色 */
+  --shell-main-bg:            #ffffff;  /* 主内容区 / 右面板背景色 */
+  --shell-main-color:         #1a1a1a;  /* 主内容区 / 右面板文字色 */
+  --shell-border-color:       rgba(0, 0, 0, 0.07); /* 分隔线颜色 */
+  --shell-icon-color:         #3a3a3a;  /* 标题栏图标色 */
+  --shell-icon-hover-bg:      rgba(0, 0, 0, 0.10); /* 图标悬停背景 */
   --shell-transition:         0.22s ease;
+  /* 默认无圆角/阴影（适合 Tauri 全屏窗口）；需要浮动卡片效果时启用： */
+  /* --shell-radius: 12px; */
+  /* --shell-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); */
 }
 ```
 

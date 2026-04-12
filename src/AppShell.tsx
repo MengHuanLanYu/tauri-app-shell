@@ -212,8 +212,6 @@ export function AppShell({
         {
           '--shell-sidebar-width': hasSidebar ? `${sidebarWidth}px` : '0px',
           '--shell-right-panel-width': `${rightPanelWidth}px`,
-          '--shell-radius': 'var(--shell-radius, 0px)',
-          '--shell-shadow': 'var(--shell-shadow, none)',
         } as React.CSSProperties
       }
     >
