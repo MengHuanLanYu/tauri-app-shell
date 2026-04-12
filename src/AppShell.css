@@ -222,8 +222,16 @@
   cursor: col-resize;
   position: relative;
   z-index: 10;
-  /* 背景与侧边栏一致，消除"背景色差"造成的双线视觉 */
+}
+
+/* 左侧把手（sidebar 右侧）：背景跟随侧边栏色，与 sidebar 融合 */
+.app-shell__resize-handle--sidebar {
   background: var(--shell-sidebar-bg);
+}
+
+/* 右侧把手（main 右侧）：背景跟随主内容区色，与 main 融合 */
+.app-shell__resize-handle--main {
+  background: var(--shell-main-bg);
 }
 
 /* 默认不显示线；悬停或当前被拖拽时才显示高亮线 */

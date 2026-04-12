@@ -277,7 +277,7 @@ export function AppShell({
         {/* 把手：sidebar 不是最后一个面板，始终渲染；collapsed 时隐藏 */}
         {hasSidebar && sidebarOpen && (
           <div
-            className="app-shell__resize-handle"
+            className="app-shell__resize-handle app-shell__resize-handle--sidebar"
             onMouseDown={(e) => startDrag('sidebar', e)}
           />
         )}
@@ -288,7 +288,7 @@ export function AppShell({
         {/* 把手：main 不是最后一个面板（rightPanel 存在时）；collapsed 时隐藏 */}
         {hasRightPanel && rightPanelOpen && (
           <div
-            className="app-shell__resize-handle"
+            className="app-shell__resize-handle app-shell__resize-handle--main"
             onMouseDown={(e) => startDrag('right', e)}
           />
         )}
