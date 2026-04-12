@@ -1,6 +1,6 @@
 /** Tauri 2.0 透明自定义标题栏 + 弹性多列布局。详见 README。 */
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { PanelLeft, PanelRight, Minus, Square, Minimize2, X } from 'lucide-react';
 import './AppShell.css';
@@ -99,12 +99,15 @@ export function AppShell({
   const [isMaximized, setIsMaximized] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(defaultSidebarWidth);
   const [rightPanelWidth, setRightPanelWidth] = useState(defaultRightPanelWidth);
-  const [isDragging, setIsDragging] = useState(false);
 
+  // 直接操作 DOM 避免 mousemove 频繁触发 React 重渲染
+  const shellRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     type: 'sidebar' | 'right';
     startX: number;
     startWidth: number;
+    currentWidth: number;
+    handleEl: HTMLDivElement;
   } | null>(null);
 
   const isMac = /mac/i.test(navigator.userAgent);
@@ -120,38 +123,56 @@ export function AppShell({
   async function close() { await getCurrentWindow().close(); }
 
   // ── 拖拽逻辑 ──────────────────────────────────────────
-  function startDrag(type: 'sidebar' | 'right', e: React.MouseEvent) {
+  // 直接操作 CSS 变量，不触发 React 重渲染，消除卡顿
+  const startDrag = useCallback((type: 'sidebar' | 'right', e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    const handleEl = e.currentTarget;
+    // 只高亮当前被拖拽的 handle
+    handleEl.setAttribute('data-active', 'true');
+    // 拖拽期间禁用 transition，消除延迟感
+    shellRef.current?.classList.add('app-shell--dragging');
+
     dragRef.current = {
       type,
       startX: e.clientX,
       startWidth: type === 'sidebar' ? sidebarWidth : rightPanelWidth,
+      currentWidth: type === 'sidebar' ? sidebarWidth : rightPanelWidth,
+      handleEl,
     };
-    setIsDragging(true);
 
     function onMove(e: MouseEvent) {
-      if (!dragRef.current) return;
+      if (!dragRef.current || !shellRef.current) return;
       const delta = e.clientX - dragRef.current.startX;
+      let w: number;
       if (dragRef.current.type === 'sidebar') {
-        const w = Math.min(Math.max(dragRef.current.startWidth + delta, sidebarMinWidth), sidebarMaxWidth);
-        setSidebarWidth(w);
+        w = Math.min(Math.max(dragRef.current.startWidth + delta, sidebarMinWidth), sidebarMaxWidth);
+        shellRef.current.style.setProperty('--shell-sidebar-width', `${w}px`);
       } else {
-        // 右面板：往左拖 delta 为负，宽度应增加
-        const w = Math.min(Math.max(dragRef.current.startWidth - delta, rightPanelMinWidth), rightPanelMaxWidth);
-        setRightPanelWidth(w);
+        w = Math.min(Math.max(dragRef.current.startWidth - delta, rightPanelMinWidth), rightPanelMaxWidth);
+        shellRef.current.style.setProperty('--shell-right-panel-width', `${w}px`);
       }
+      dragRef.current.currentWidth = w;
     }
 
     function onUp() {
+      if (dragRef.current) {
+        dragRef.current.handleEl.removeAttribute('data-active');
+        // mouseup 时才同步回 React state（触发一次重渲染）
+        if (dragRef.current.type === 'sidebar') {
+          setSidebarWidth(dragRef.current.currentWidth);
+        } else {
+          setRightPanelWidth(dragRef.current.currentWidth);
+        }
+      }
       dragRef.current = null;
-      setIsDragging(false);
+      shellRef.current?.classList.remove('app-shell--dragging');
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
     }
 
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
-  }
+  }, [sidebarWidth, rightPanelWidth, sidebarMinWidth, sidebarMaxWidth, rightPanelMinWidth, rightPanelMaxWidth]);
 
   // 解析两个 toggle 插槽
   const resolvedSidebarToggle = resolveToggle(
@@ -185,7 +206,8 @@ export function AppShell({
 
   return (
     <div
-      className={['app-shell', isDragging ? 'app-shell--dragging' : ''].join(' ')}
+      ref={shellRef}
+      className="app-shell"
       style={
         {
           '--shell-sidebar-width': hasSidebar ? `${sidebarWidth}px` : '0px',

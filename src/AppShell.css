@@ -52,10 +52,16 @@
   box-shadow: var(--shell-shadow);
 }
 
-/* 拖拽分隔条时禁止全局文字选中 */
+/* 拖拽分隔条时：禁止文字选中、全局 cursor、禁用面板 transition */
 .app-shell--dragging {
   user-select: none;
   cursor: col-resize;
+}
+
+.app-shell--dragging .app-shell__sidebar,
+.app-shell--dragging .app-shell__right-panel,
+.app-shell--dragging .app-shell__tb-left {
+  transition: none;
 }
 
 /* ── 标题栏：透明绝对浮层 ── */
@@ -216,11 +222,11 @@
   cursor: col-resize;
   position: relative;
   z-index: 10;
-  background: transparent;
-  transition: background 0.15s;
+  /* 背景与侧边栏一致，消除"背景色差"造成的双线视觉 */
+  background: var(--shell-sidebar-bg);
 }
 
-/* 细线居中显示 */
+/* 默认不显示线；悬停或当前被拖拽时才显示高亮线 */
 .app-shell__resize-handle::after {
   content: '';
   position: absolute;
@@ -228,15 +234,20 @@
   bottom: 0;
   left: 2px;
   width: 1px;
-  background: var(--shell-border-color);
+  background: transparent;
   transition: background 0.15s, left 0.15s, width 0.15s;
 }
 
-.app-shell__resize-handle:hover::after,
-.app-shell--dragging .app-shell__resize-handle::after {
+/* 只高亮悬停的 handle */
+.app-shell__resize-handle:hover::after {
+  background: rgba(100, 130, 255, 0.45);
+}
+
+/* 只高亮当前被拖拽的 handle（data-active 由 JS 精确控制） */
+.app-shell__resize-handle[data-active]::after {
   left: 1px;
   width: 3px;
-  background: rgba(100, 130, 255, 0.5);
+  background: rgba(100, 130, 255, 0.6);
 }
 
 /* ── 主内容 ── */
