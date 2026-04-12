@@ -27,6 +27,7 @@
   --shell-sidebar-bg:         #f3f3f3;
   --shell-sidebar-color:      #3a3c3e;
   --shell-main-bg:            #ffffff;
+  --shell-main-color:         #1a1a1a;
   --shell-border-color:       rgba(0, 0, 0, 0.07);
   --shell-icon-color:         #3a3a3a;
   --shell-icon-hover-bg:      rgba(0, 0, 0, 0.10);
@@ -209,6 +210,7 @@
   flex: 1;
   min-width: 0;
   background: var(--shell-main-bg);
+  color: var(--shell-main-color);
   overflow: auto;
   padding-top: var(--shell-titlebar-height);
 }
@@ -218,6 +220,7 @@
   width: var(--shell-right-panel-width);
   flex-shrink: 0;
   background: var(--shell-main-bg);
+  color: var(--shell-main-color);
   border-left: 1px solid var(--shell-border-color);
   display: flex;
   flex-direction: column;
@@ -234,27 +237,28 @@
 /* ── 深色模式 ── */
 @media (prefers-color-scheme: dark) {
   .app-shell {
-    --shell-sidebar-bg:       #2a2520;
-    --shell-sidebar-color:    #c8cacc;
-    --shell-main-bg:          #ffffff;
-    --shell-border-color:     rgba(255, 255, 255, 0.07);
-    --shell-icon-color:       #c0c0c0;
+    --shell-sidebar-bg:       #444444;
+    --shell-sidebar-color:    #e2e2e2;
+    --shell-main-bg:          #181818;
+    --shell-main-color:       #ffffff;
+    --shell-border-color:     rgba(255, 255, 255, 0.08);
+    --shell-icon-color:       #d0d0d0;
     --shell-icon-hover-bg:    rgba(255, 255, 255, 0.12);
     --shell-shadow:           none;
   }
 
   .app-shell__tb-center {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.45);
   }
 
   .app-shell__icon-btn:hover {
-    color: #fff;
+    color: #ffffff;
   }
 
   .app-shell__win-btn {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #bbb;
+    color: #d0d0d0;
   }
 
   .app-shell__win-btn:hover {
