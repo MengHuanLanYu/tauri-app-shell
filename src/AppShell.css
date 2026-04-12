@@ -234,7 +234,7 @@
   border-left-color: transparent;
 }
 
-/* ── 深色模式 ── */
+/* ── 深色模式：跟随系统 或 html[data-theme="dark"] ── */
 @media (prefers-color-scheme: dark) {
   .app-shell {
     --shell-sidebar-bg:       #444444;
@@ -247,13 +247,8 @@
     --shell-shadow:           none;
   }
 
-  .app-shell__tb-center {
-    color: rgba(255, 255, 255, 0.45);
-  }
-
-  .app-shell__icon-btn:hover {
-    color: #ffffff;
-  }
+  .app-shell__tb-center { color: rgba(255, 255, 255, 0.45); }
+  .app-shell__icon-btn:hover { color: #ffffff; }
 
   .app-shell__win-btn {
     background: rgba(255, 255, 255, 0.06);
@@ -261,7 +256,50 @@
     color: #d0d0d0;
   }
 
-  .app-shell__win-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
+  .app-shell__win-btn:hover { background: rgba(255, 255, 255, 0.1); }
 }
+
+/* 手动切换：html[data-theme="dark"]，优先级高于媒体查询 */
+html[data-theme="dark"] .app-shell {
+  --shell-sidebar-bg:       #444444;
+  --shell-sidebar-color:    #e2e2e2;
+  --shell-main-bg:          #181818;
+  --shell-main-color:       #ffffff;
+  --shell-border-color:     rgba(255, 255, 255, 0.08);
+  --shell-icon-color:       #d0d0d0;
+  --shell-icon-hover-bg:    rgba(255, 255, 255, 0.12);
+  --shell-shadow:           none;
+}
+
+html[data-theme="dark"] .app-shell__tb-center { color: rgba(255, 255, 255, 0.45); }
+html[data-theme="dark"] .app-shell__icon-btn:hover { color: #ffffff; }
+
+html[data-theme="dark"] .app-shell__win-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #d0d0d0;
+}
+
+html[data-theme="dark"] .app-shell__win-btn:hover { background: rgba(255, 255, 255, 0.1); }
+
+/* 手动强制浅色，覆盖系统深色偏好 */
+html[data-theme="light"] .app-shell {
+  --shell-sidebar-bg:       #f3f3f3;
+  --shell-sidebar-color:    #3a3c3e;
+  --shell-main-bg:          #ffffff;
+  --shell-main-color:       #1a1a1a;
+  --shell-border-color:     rgba(0, 0, 0, 0.07);
+  --shell-icon-color:       #3a3a3a;
+  --shell-icon-hover-bg:    rgba(0, 0, 0, 0.10);
+}
+
+html[data-theme="light"] .app-shell__tb-center { color: rgba(0, 0, 0, 0.45); }
+html[data-theme="light"] .app-shell__icon-btn:hover { color: #000000; }
+
+html[data-theme="light"] .app-shell__win-btn {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #444;
+}
+
+html[data-theme="light"] .app-shell__win-btn:hover { background: rgba(0, 0, 0, 0.07); }
