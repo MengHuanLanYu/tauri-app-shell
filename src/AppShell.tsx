@@ -47,8 +47,15 @@ export interface AppShellProps {
   // ── 行为控制 ──────────────────────────────────────────
   /** 侧边栏初始展开状态，默认 true */
   defaultSidebarOpen?: boolean;
-  /** 右侧面板初始展开状态，默认 true */
+  /**
+   * 受控：右侧面板展开状态。
+   * 传入后进入受控模式，AppShell 不再维护内部开关状态。
+   */
+  rightPanelOpen?: boolean;
+  /** 非受控：右侧面板初始展开状态，默认 true */
   defaultRightPanelOpen?: boolean;
+  /** 受控模式下，面板开关变化时的回调 */
+  onRightPanelOpenChange?: (open: boolean) => void;
   /** 侧边栏初始宽度 px，默认 220 */
   defaultSidebarWidth?: number;
   /** 侧边栏最小宽度 px，默认 140 */
@@ -86,7 +93,9 @@ export function AppShell({
   titlebarCenter,
   titlebarRight,
   defaultSidebarOpen = true,
+  rightPanelOpen: rightPanelOpenProp,
   defaultRightPanelOpen = true,
+  onRightPanelOpenChange,
   defaultSidebarWidth = 220,
   sidebarMinWidth = SIDEBAR_MIN,
   sidebarMaxWidth = SIDEBAR_MAX,
@@ -95,8 +104,19 @@ export function AppShell({
   rightPanelMaxWidth = RIGHT_PANEL_MAX,
 }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(defaultSidebarOpen);
-  const [rightPanelOpen, setRightPanelOpen] = useState(defaultRightPanelOpen);
+  const [innerRightPanelOpen, setInnerRightPanelOpen] = useState(defaultRightPanelOpen);
   const [isMaximized, setIsMaximized] = useState(false);
+
+  // ── 受控 / 非受控逻辑 ────────────────────────────────────
+  const isRightPanelControlled = rightPanelOpenProp !== undefined;
+  const actualRightPanelOpen = isRightPanelControlled ? rightPanelOpenProp : innerRightPanelOpen;
+
+  function setRightPanelOpen(next: boolean) {
+    if (!isRightPanelControlled) {
+      setInnerRightPanelOpen(next);
+    }
+    onRightPanelOpenChange?.(next);
+  }
   const [sidebarWidth, setSidebarWidth] = useState(defaultSidebarWidth);
   const [rightPanelWidth, setRightPanelWidth] = useState(defaultRightPanelWidth);
 
@@ -194,8 +214,8 @@ export function AppShell({
     <button
       type="button"
       className="app-shell__icon-btn"
-      title={rightPanelOpen ? '收起右侧面板' : '展开右侧面板'}
-      onClick={() => setRightPanelOpen((v) => !v)}
+      title={actualRightPanelOpen ? '收起右侧面板' : '展开右侧面板'}
+      onClick={() => setRightPanelOpen(!actualRightPanelOpen)}
     >
       <PanelRight size={16} />
     </button>,
@@ -284,7 +304,7 @@ export function AppShell({
         <main className="app-shell__main">{children}</main>
 
         {/* 把手：main 不是最后一个面板（rightPanel 存在时）；collapsed 时隐藏 */}
-        {hasRightPanel && rightPanelOpen && (
+        {hasRightPanel && actualRightPanelOpen && (
           <div
             className="app-shell__resize-handle app-shell__resize-handle--main"
             onMouseDown={(e) => startDrag('right', e)}
@@ -292,7 +312,7 @@ export function AppShell({
         )}
         {/* 右面板（若存在）：最后一个面板，右侧无把手 */}
         {hasRightPanel && (
-          <aside className={`app-shell__right-panel ${rightPanelOpen ? '' : 'app-shell__right-panel--collapsed'}`}>
+          <aside className={`app-shell__right-panel ${actualRightPanelOpen ? '' : 'app-shell__right-panel--collapsed'}`}>
             {rightPanel}
           </aside>
         )}

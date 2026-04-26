@@ -232,6 +232,62 @@ export default function App() {
 </AppShell>
 ```
 
+### 右侧面板受控模式
+
+默认情况下右侧面板的开关由 `AppShell` 内部维护（非受控）。
+传入 `rightPanelOpen` 后进入**受控模式**，开关状态完全由调用方管理。
+
+#### 场景一：业务状态驱动（密码模块）
+
+第三列跟随选中项自动打开/关闭，隐藏内置 toggle 按钮：
+
+```tsx
+<AppShell
+  sidebar={<MainNav />}
+  rightPanel={selectedPassword ? <PasswordDetail /> : undefined}
+  rightPanelOpen={!!selectedPassword}
+  rightPanelToggle={false}
+>
+  <PasswordList />
+</AppShell>
+```
+
+#### 场景二：业务状态 + 允许手动收起
+
+有选中项时面板打开，但用户仍可点击按钮手动收起：
+
+```tsx
+const [panelOpen, setPanelOpen] = useState(false);
+
+// 选中项变化时同步打开面板
+useEffect(() => {
+  if (selectedItem) setPanelOpen(true);
+}, [selectedItem]);
+
+<AppShell
+  sidebar={<MainNav />}
+  rightPanel={<Inspector item={selectedItem} />}
+  rightPanelOpen={panelOpen}
+  onRightPanelOpenChange={setPanelOpen}   // 按钮点击 → 这里被调用 → 状态更新
+>
+  <ItemList />
+</AppShell>
+```
+
+#### 场景三：非受控（默认行为，向后兼容）
+
+不传 `rightPanelOpen`，行为与之前完全一致：
+
+```tsx
+<AppShell
+  sidebar={<LeftSidebar />}
+  rightPanel={<RightPanel />}
+  defaultRightPanelOpen={true}   // 仅控制初始状态
+>
+  <main>主内容</main>
+</AppShell>
+```
+
 ---
 
 ## Props
@@ -247,8 +303,10 @@ export default function App() {
 | `titlebarLeft`           | `ReactNode`         | —           | 标题栏左侧额外内容（sidebarToggle 之后）                     |
 | `titlebarCenter`         | `ReactNode`         | —           | 标题栏中间（可拖拽区域内）                                   |
 | `titlebarRight`          | `ReactNode`         | —           | 标题栏右侧额外内容（rightPanelToggle 之前）                  |
-| `defaultSidebarOpen`     | `boolean`           | `true`      | 侧边栏初始展开状态                                       |
-| `defaultRightPanelOpen`  | `boolean`           | `true`      | 右侧面板初始展开状态                                      |
+| `defaultSidebarOpen`        | `boolean`                | `true`      | 侧边栏初始展开状态                                                  |
+| `rightPanelOpen`            | `boolean`                | —           | **受控**：右侧面板展开状态；传入后由调用方管理，AppShell 不再维护内部状态               |
+| `defaultRightPanelOpen`     | `boolean`                | `true`      | **非受控**：右侧面板初始展开状态（`rightPanelOpen` 未传时生效）                |
+| `onRightPanelOpenChange`    | `(open: boolean) => void` | —           | 受控模式下面板开关变化时的回调；非受控模式下按钮点击同样会触发，可用于监听 |
 | `defaultSidebarWidth`    | `number`            | `220`       | 侧边栏初始宽度（px）                                     |
 | `sidebarMinWidth`        | `number`            | `140`       | 侧边栏拖拽最小宽度（px）                                   |
 | `sidebarMaxWidth`        | `number`            | `480`       | 侧边栏拖拽最大宽度（px）                                   |
