@@ -5,6 +5,7 @@ Tauri 2.0 + React 透明自定义标题栏 + 弹性多列布局组件。
 - 透明窗口，标题栏颜色与下方内容列自然连续
 - macOS 保留原生红绿灯，Windows / Linux 自绘窗口控制按钮
 - 支持单栏 / 两栏 / 三栏，侧边栏和右侧面板均可折叠、可拖拽调整宽度
+- 支持侧边栏拖拽吸附：就近吸附、阈值吸附、方向吸附三种模式
 - 所有标题栏区域均为插槽，完全自定义
 - 内置浅色 / 深色主题，支持跟随系统或手动切换
 
@@ -19,7 +20,7 @@ pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git
 锁定版本（推荐生产环境）：
 
 ```bash
-pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.0
+pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.4
 ```
 
 ---
@@ -232,6 +233,62 @@ export default function App() {
 </AppShell>
 ```
 
+### 侧边栏宽度吸附
+
+默认拖拽是连续宽度。传入 `sidebarSnapPoints` 后，侧边栏会在拖拽过程中或拖拽结束时吸附到指定宽度。
+
+#### 就近吸附（nearest，默认）
+
+拖拽结束时吸附到距离当前位置最近的宽度点，适合一般工具面板。
+
+```tsx
+<AppShell
+  sidebar={<Sidebar />}
+  defaultSidebarWidth={200}
+  sidebarMinWidth={80}
+  sidebarMaxWidth={200}
+  sidebarSnapPoints={[80, 200]}
+  sidebarSnapMode="nearest"
+>
+  <main>主内容</main>
+</AppShell>
+```
+
+#### 阈值吸附（threshold）
+
+拖拽结束时按阈值判断。以下示例中，`<= 80` 吸到 `80`，`> 80` 吸到 `200`。
+
+```tsx
+<AppShell
+  sidebar={<Sidebar />}
+  defaultSidebarWidth={200}
+  sidebarMinWidth={80}
+  sidebarMaxWidth={200}
+  sidebarSnapPoints={[80, 200]}
+  sidebarSnapMode="threshold"
+  sidebarSnapThreshold={80}
+>
+  <main>主内容</main>
+</AppShell>
+```
+
+#### 方向吸附（direction）
+
+拖拽过程中立即按方向切换：向右拖吸到最大点，向左拖吸到最小点。适合企业微信式“窄栏 / 展开栏”两态导航。
+
+```tsx
+<AppShell
+  sidebar={<Sidebar />}
+  defaultSidebarWidth={200}
+  sidebarMinWidth={80}
+  sidebarMaxWidth={200}
+  sidebarSnapPoints={[80, 200]}
+  sidebarSnapMode="direction"
+>
+  <main>主内容</main>
+</AppShell>
+```
+
 ### 右侧面板受控模式
 
 默认情况下右侧面板的开关由 `AppShell` 内部维护（非受控）。
@@ -310,6 +367,9 @@ useEffect(() => {
 | `defaultSidebarWidth`    | `number`            | `220`       | 侧边栏初始宽度（px）                                     |
 | `sidebarMinWidth`        | `number`            | `140`       | 侧边栏拖拽最小宽度（px）                                   |
 | `sidebarMaxWidth`        | `number`            | `480`       | 侧边栏拖拽最大宽度（px）                                   |
+| `sidebarSnapPoints`      | `readonly number[]` | —           | 侧边栏吸附宽度点；不传则保持连续拖拽                         |
+| `sidebarSnapMode`        | `'nearest' \| 'threshold' \| 'direction'` | `'nearest'` | 吸附模式：就近、阈值、方向                                 |
+| `sidebarSnapThreshold`   | `number`            | 最小吸附点   | `threshold` 模式阈值；`<=` 阈值吸到最小点，否则吸到最大点      |
 | `defaultRightPanelWidth` | `number`            | `260`       | 右侧面板初始宽度（px）                                    |
 | `rightPanelMinWidth`     | `number`            | `160`       | 右侧面板拖拽最小宽度（px）                                  |
 | `rightPanelMaxWidth`     | `number`            | `520`       | 右侧面板拖拽最大宽度（px）                                  |
@@ -381,5 +441,4 @@ pnpm install
 | `react-dom`       | `>=18`      |
 | `@tauri-apps/api` | `>=2`       |
 | `lucide-react`    | `>=0.300.0` |
-
 
