@@ -68,8 +68,9 @@ export interface AppShellProps {
    * 侧边栏吸附模式：
    * - nearest: 吸附到最近的 snap point
    * - threshold: <= sidebarSnapThreshold 吸到最小点，否则吸到最大点
+   * - direction: 向左拖吸到最小点，向右拖吸到最大点
    */
-  sidebarSnapMode?: 'nearest' | 'threshold';
+  sidebarSnapMode?: 'nearest' | 'threshold' | 'direction';
   /** threshold 模式阈值，默认使用最小吸附点 */
   sidebarSnapThreshold?: number;
   /** 右侧面板初始宽度 px，默认 260 */
@@ -155,6 +156,12 @@ export function AppShell({
   }
   async function close() { await getCurrentWindow().close(); }
 
+  function getSidebarSnapPoints() {
+    return sidebarSnapPoints?.length
+      ? [...sidebarSnapPoints].sort((a, b) => a - b)
+      : [];
+  }
+
   function resolveSidebarWidth(width: number) {
     const clampedWidth = Math.min(Math.max(width, sidebarMinWidth), sidebarMaxWidth);
 
@@ -162,7 +169,7 @@ export function AppShell({
       return clampedWidth;
     }
 
-    const sortedSnapPoints = [...sidebarSnapPoints].sort((a, b) => a - b);
+    const sortedSnapPoints = getSidebarSnapPoints();
 
     if (sidebarSnapMode === 'threshold' && sortedSnapPoints.length >= 2) {
       return clampedWidth <= (sidebarSnapThreshold ?? sortedSnapPoints[0])
@@ -198,7 +205,14 @@ export function AppShell({
       const delta = e.clientX - dragRef.current.startX;
       let w: number;
       if (dragRef.current.type === 'sidebar') {
-        w = Math.min(Math.max(dragRef.current.startWidth + delta, sidebarMinWidth), sidebarMaxWidth);
+        const sortedSnapPoints = getSidebarSnapPoints();
+        if (sidebarSnapMode === 'direction' && sortedSnapPoints.length >= 2 && delta !== 0) {
+          w = delta > 0
+            ? sortedSnapPoints[sortedSnapPoints.length - 1]
+            : sortedSnapPoints[0];
+        } else {
+          w = Math.min(Math.max(dragRef.current.startWidth + delta, sidebarMinWidth), sidebarMaxWidth);
+        }
         shellRef.current.style.setProperty('--shell-sidebar-width', `${w}px`);
       } else {
         w = Math.min(Math.max(dragRef.current.startWidth - delta, rightPanelMinWidth), rightPanelMaxWidth);
