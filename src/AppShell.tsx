@@ -62,6 +62,16 @@ export interface AppShellProps {
   sidebarMinWidth?: number;
   /** 侧边栏最大宽度 px，默认 480 */
   sidebarMaxWidth?: number;
+  /** 侧边栏吸附宽度点；传入后拖拽结束会吸附到指定宽度 */
+  sidebarSnapPoints?: readonly number[];
+  /**
+   * 侧边栏吸附模式：
+   * - nearest: 吸附到最近的 snap point
+   * - threshold: <= sidebarSnapThreshold 吸到最小点，否则吸到最大点
+   */
+  sidebarSnapMode?: 'nearest' | 'threshold';
+  /** threshold 模式阈值，默认使用最小吸附点 */
+  sidebarSnapThreshold?: number;
   /** 右侧面板初始宽度 px，默认 260 */
   defaultRightPanelWidth?: number;
   /** 右侧面板最小宽度 px，默认 160 */
@@ -99,6 +109,9 @@ export function AppShell({
   defaultSidebarWidth = 220,
   sidebarMinWidth = SIDEBAR_MIN,
   sidebarMaxWidth = SIDEBAR_MAX,
+  sidebarSnapPoints,
+  sidebarSnapMode = 'nearest',
+  sidebarSnapThreshold,
   defaultRightPanelWidth = 260,
   rightPanelMinWidth = RIGHT_PANEL_MIN,
   rightPanelMaxWidth = RIGHT_PANEL_MAX,
@@ -142,6 +155,26 @@ export function AppShell({
   }
   async function close() { await getCurrentWindow().close(); }
 
+  function resolveSidebarWidth(width: number) {
+    const clampedWidth = Math.min(Math.max(width, sidebarMinWidth), sidebarMaxWidth);
+
+    if (!sidebarSnapPoints?.length) {
+      return clampedWidth;
+    }
+
+    const sortedSnapPoints = [...sidebarSnapPoints].sort((a, b) => a - b);
+
+    if (sidebarSnapMode === 'threshold' && sortedSnapPoints.length >= 2) {
+      return clampedWidth <= (sidebarSnapThreshold ?? sortedSnapPoints[0])
+        ? sortedSnapPoints[0]
+        : sortedSnapPoints[sortedSnapPoints.length - 1];
+    }
+
+    return sortedSnapPoints.reduce((nearest, point) => (
+      Math.abs(point - clampedWidth) < Math.abs(nearest - clampedWidth) ? point : nearest
+    ), sortedSnapPoints[0]);
+  }
+
   // ── 拖拽逻辑 ──────────────────────────────────────────
   // 直接操作 CSS 变量，不触发 React 重渲染，消除卡顿
   const startDrag = useCallback((type: 'sidebar' | 'right', e: React.MouseEvent<HTMLDivElement>) => {
@@ -175,24 +208,42 @@ export function AppShell({
     }
 
     function onUp() {
+      const shellEl = shellRef.current;
+
       if (dragRef.current) {
         dragRef.current.handleEl.removeAttribute('data-active');
         // mouseup 时才同步回 React state（触发一次重渲染）
         if (dragRef.current.type === 'sidebar') {
-          setSidebarWidth(dragRef.current.currentWidth);
+          const nextWidth = resolveSidebarWidth(dragRef.current.currentWidth);
+          shellEl?.style.setProperty('--shell-sidebar-width', `${nextWidth}px`);
+          // Apply the snapped width while transitions are still disabled.
+          void shellEl?.offsetWidth;
+          setSidebarWidth(nextWidth);
         } else {
           setRightPanelWidth(dragRef.current.currentWidth);
         }
       }
       dragRef.current = null;
-      shellRef.current?.classList.remove('app-shell--dragging');
+      requestAnimationFrame(() => {
+        shellEl?.classList.remove('app-shell--dragging');
+      });
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
     }
 
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
-  }, [sidebarWidth, rightPanelWidth, sidebarMinWidth, sidebarMaxWidth, rightPanelMinWidth, rightPanelMaxWidth]);
+  }, [
+    sidebarWidth,
+    rightPanelWidth,
+    sidebarMinWidth,
+    sidebarMaxWidth,
+    sidebarSnapPoints,
+    sidebarSnapMode,
+    sidebarSnapThreshold,
+    rightPanelMinWidth,
+    rightPanelMaxWidth,
+  ]);
 
   // 解析两个 toggle 插槽
   const resolvedSidebarToggle = resolveToggle(
