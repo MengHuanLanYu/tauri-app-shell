@@ -28,14 +28,37 @@ npm install tauri-app-shell
 锁定版本（推荐生产环境）：
 
 ```bash
-pnpm add tauri-app-shell@0.2.0
+pnpm add tauri-app-shell@<version>
 ```
+
+将 `<version>` 替换为你要使用的发布版本。
 
 ---
 
 ## Tauri 侧配置（必须）
 
-### 1. 平台配置文件
+### 1. 基础窗口配置
+
+`src-tauri/tauri.conf.json`
+
+```json
+{
+  "app": {
+    "windows": [{
+      "title": "app",
+      "width": 1200,
+      "height": 800,
+      "center": true,
+      "minWidth": 600,
+      "minHeight": 400
+    }]
+  }
+}
+```
+
+将公共配置保留在基础文件里，把透明窗口、标题栏样式等平台差异放到各平台配置文件中。
+
+### 2. 平台配置文件
 
 `**src-tauri/tauri.macos.conf.json**`
 
@@ -72,7 +95,19 @@ pnpm add tauri-app-shell@0.2.0
 }
 ```
 
-### 2. 开启拖拽权限
+Tauri 不会自动发现这些平台配置文件。请在 `package.json` 里显式传入 `--config`：
+
+```json
+{
+  "scripts": {
+    "tauri:dev:mac": "tauri dev --config src-tauri/tauri.macos.conf.json",
+    "tauri:dev:win": "tauri dev --config src-tauri/tauri.windows.conf.json",
+    "tauri:dev:linux": "tauri dev --config src-tauri/tauri.linux.conf.json"
+  }
+}
+```
+
+### 3. 开启拖拽权限
 
 `**src-tauri/capabilities/default.json**`
 
@@ -418,6 +453,27 @@ const [panelOpen, setPanelOpen] = useState(false);
 
 ---
 
+## 主题切换
+
+默认跟随系统 `prefers-color-scheme`。如需手动切换，在 `<html>` 上设置 `data-theme`：
+
+```ts
+document.documentElement.setAttribute('data-theme', 'dark');
+document.documentElement.setAttribute('data-theme', 'light');
+document.documentElement.removeAttribute('data-theme');
+```
+
+React 中可以这样写：
+
+```tsx
+useEffect(() => {
+  document.documentElement.setAttribute('data-theme', theme);
+  return () => document.documentElement.removeAttribute('data-theme');
+}, [theme]);
+```
+
+---
+
 ## CSS 变量定制
 
 在 `.app-shell` 父元素上覆盖变量即可调整主题：
@@ -458,7 +514,7 @@ const [panelOpen, setPanelOpen] = useState(false);
 
 ```bash
 # 格式：pnpm release <版本号>
-pnpm release 0.2.0
+pnpm release <version>
 ```
 
 脚本会自动校验：
@@ -470,7 +526,7 @@ pnpm release 0.2.0
 发版成功后，其他项目执行以下命令升级：
 
 ```bash
-pnpm add tauri-app-shell@0.2.0
+pnpm add tauri-app-shell@<version>
 ```
 
 > **注意**：首次发布前请确保已登录 npm（`npm login`）。
@@ -486,4 +542,3 @@ pnpm add tauri-app-shell@0.2.0
 | `react-dom`       | `>=18`      |
 | `@tauri-apps/api` | `>=2`       |
 | `lucide-react`    | `>=0.300.0` |
-
