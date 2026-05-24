@@ -38,6 +38,14 @@
        --shell-shadow: 0 20px 60px rgba(0,0,0,0.25); */
   --shell-radius:             0px;
   --shell-shadow:             none;
+  /* ── 底部面板 / 状态栏 ── */
+  --shell-bottom-panel-height: 200px;
+  --shell-bottom-panel-bg:    var(--shell-main-bg);
+  --shell-bottom-panel-color: var(--shell-main-color);
+  --shell-statusbar-height:   24px;
+  --shell-statusbar-bg:       #f3f3f3;
+  --shell-statusbar-color:    #5a5a5a;
+  --shell-statusbar-border-color: rgba(0, 0, 0, 0.08);
 }
 
 /* ── 窗口外壳 ── */
@@ -60,8 +68,14 @@
 
 .app-shell--dragging .app-shell__sidebar,
 .app-shell--dragging .app-shell__right-panel,
+.app-shell--dragging .app-shell__bottom-panel,
 .app-shell--dragging .app-shell__tb-left {
   transition: none;
+}
+
+/* 垂直拖拽时覆盖 cursor */
+.app-shell--dragging-v {
+  cursor: row-resize;
 }
 
 /* ── 标题栏：透明绝对浮层 ── */
@@ -294,6 +308,93 @@
   width: 0;
 }
 
+/* ── 工作台容器 ── */
+.app-shell__workbench {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-shell__workbench-content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* center 模式下：包裹 main + bottomPanel 的纵向容器 */
+.app-shell__main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── 底部面板 ── */
+.app-shell__bottom-panel {
+  height: var(--shell-bottom-panel-height);
+  flex-shrink: 0;
+  background: var(--shell-bottom-panel-bg);
+  color: var(--shell-bottom-panel-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: height var(--shell-transition);
+}
+
+.app-shell__bottom-panel--collapsed {
+  height: 0;
+}
+
+/* ── 底部面板垂直拖拽把手 ── */
+.app-shell__resize-handle--bottom {
+  width: 100%;
+  height: 5px;
+  cursor: row-resize;
+}
+
+.app-shell__resize-handle--bottom::after {
+  top: 2px;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  width: auto;
+  height: 1px;
+  background: var(--shell-border-color);
+}
+
+.app-shell__resize-handle--bottom:hover::after {
+  background: rgba(100, 130, 255, 0.45);
+}
+
+.app-shell__resize-handle--bottom[data-active]::after {
+  top: 1px;
+  height: 3px;
+  background: rgba(100, 130, 255, 0.6);
+}
+
+/* ── 状态栏 ── */
+.app-shell__status-bar {
+  height: var(--shell-statusbar-height);
+  flex-shrink: 0;
+  background-color: var(--shell-statusbar-bg);
+  color: var(--shell-statusbar-color);
+  border-top: 1px solid var(--shell-statusbar-border-color);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  user-select: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* ── 深色模式：跟随系统 或 html[data-theme="dark"] ── */
 @media (prefers-color-scheme: dark) {
   .app-shell {
@@ -305,6 +406,9 @@
     --shell-icon-color:       #d0d0d0;
     --shell-icon-hover-bg:    rgba(255, 255, 255, 0.12);
     --shell-shadow:           none;
+    --shell-statusbar-bg:     #18181b;
+    --shell-statusbar-color:  #a1a1aa;
+    --shell-statusbar-border-color: rgba(255, 255, 255, 0.08);
   }
 
   .app-shell__tb-center { color: rgba(255, 255, 255, 0.45); }
@@ -329,6 +433,9 @@ html[data-theme="dark"] .app-shell {
   --shell-icon-color:       #d0d0d0;
   --shell-icon-hover-bg:    rgba(255, 255, 255, 0.12);
   --shell-shadow:           none;
+  --shell-statusbar-bg:     #18181b;
+  --shell-statusbar-color:  #a1a1aa;
+  --shell-statusbar-border-color: rgba(255, 255, 255, 0.08);
 }
 
 html[data-theme="dark"] .app-shell__tb-center { color: rgba(255, 255, 255, 0.45); }
@@ -351,6 +458,9 @@ html[data-theme="light"] .app-shell {
   --shell-border-color:     rgba(0, 0, 0, 0.07);
   --shell-icon-color:       #3a3a3a;
   --shell-icon-hover-bg:    rgba(0, 0, 0, 0.10);
+  --shell-statusbar-bg:     #f3f3f3;
+  --shell-statusbar-color:  #5a5a5a;
+  --shell-statusbar-border-color: rgba(0, 0, 0, 0.08);
 }
 
 html[data-theme="light"] .app-shell__tb-center { color: rgba(0, 0, 0, 0.45); }

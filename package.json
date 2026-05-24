@@ -1,14 +1,25 @@
 {
   "name": "tauri-app-shell",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "Transparent custom titlebar + flexible multi-column layout shell for Tauri 2.0 + React",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MengHuanLanYu/tauri-app-shell.git"
+  },
+  "homepage": "https://github.com/MengHuanLanYu/tauri-app-shell#readme",
+  "bugs": {
+    "url": "https://github.com/MengHuanLanYu/tauri-app-shell/issues"
+  },
   "keywords": [
     "tauri",
     "tauri2",
     "react",
     "titlebar",
     "layout",
-    "shell"
+    "shell",
+    "app-shell",
+    "bottom-panel",
+    "status-bar"
   ],
   "license": "MIT",
   "type": "module",

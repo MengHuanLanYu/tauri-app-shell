@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# release.sh — 一键发布新版本
+# release.sh — 一键发布新版本（Git Tag + npm publish）
 # 用法：bash scripts/release.sh 0.2.0
 
 set -e
@@ -60,8 +60,25 @@ echo "🚀 推送到远程..."
 git push origin main
 git push origin "$TAG"
 
+# ── 发布到 npm ───────────────────────────────────────
 echo ""
-echo "✅ 发布完成！$TAG 已推送到远程"
+echo "⚠️  即将发布 tauri-app-shell@$VERSION 到 npm"
+echo "   npm 版本一经发布不可覆盖，请确认版本号无误！"
+echo ""
+read -r -p "确认发布到 npm？(y/N) " confirm
+if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+  echo "⏭️  跳过 npm 发布（Git Tag 已推送）"
+  echo "   后续手动发布：npm publish --access public"
+  exit 0
+fi
+
+echo "📦 发布到 npm..."
+npm publish --access public
+
+echo ""
+echo "✅ 发布完成！$TAG 已推送到 Git 远程并发布到 npm"
 echo ""
 echo "其他项目安装命令："
-echo "  pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#$TAG"
+echo "  pnpm add tauri-app-shell@$VERSION"
+echo "  # 或"
+echo "  npm install tauri-app-shell@$VERSION"
