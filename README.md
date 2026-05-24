@@ -6,6 +6,8 @@ Tauri 2.0 + React 透明自定义标题栏 + 弹性多列布局组件。
 - macOS 保留原生红绿灯，Windows / Linux 自绘窗口控制按钮
 - 支持单栏 / 两栏 / 三栏，侧边栏和右侧面板均可折叠、可拖拽调整宽度
 - 支持侧边栏拖拽吸附：就近吸附、阈值吸附、方向吸附三种模式
+- 底部面板（Bottom Panel）：可拖拽调整高度，支持 wide/center 两种布局模式
+- 状态栏（Status Bar）：固定高度信息展示栏，支持 full/workbench 两种布局模式
 - 所有标题栏区域均为插槽，完全自定义
 - 内置浅色 / 深色主题，支持跟随系统或手动切换
 
@@ -14,13 +16,19 @@ Tauri 2.0 + React 透明自定义标题栏 + 弹性多列布局组件。
 ## 安装
 
 ```bash
-pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git
+pnpm add tauri-app-shell
+```
+
+或使用 npm：
+
+```bash
+npm install tauri-app-shell
 ```
 
 锁定版本（推荐生产环境）：
 
 ```bash
-pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.1.4
+pnpm add tauri-app-shell@0.2.0
 ```
 
 ---
@@ -289,59 +297,81 @@ export default function App() {
 </AppShell>
 ```
 
-### 右侧面板受控模式
+### 底部面板（Bottom Panel）
 
-默认情况下右侧面板的开关由 `AppShell` 内部维护（非受控）。
-传入 `rightPanelOpen` 后进入**受控模式**，开关状态完全由调用方管理。
+可拖拽调整高度的富内容面板（终端、日志、输出等）。
 
-#### 场景一：业务状态驱动（密码模块）
-
-第三列跟随选中项自动打开/关闭，隐藏内置 toggle 按钮：
+#### wide 模式（默认）—— 面板横跨 Main + RightPanel
 
 ```tsx
 <AppShell
-  sidebar={<MainNav />}
-  rightPanel={selectedPassword ? <PasswordDetail /> : undefined}
-  rightPanelOpen={!!selectedPassword}
-  rightPanelToggle={false}
+  sidebar={<FileTree />}
+  rightPanel={<AICopilot />}
+  bottomPanel={<Terminal />}
 >
-  <PasswordList />
+  <EditorArea />
 </AppShell>
 ```
 
-#### 场景二：业务状态 + 允许手动收起
+#### center 模式 —— 面板仅在 Main 下方，RightPanel 全高
 
-有选中项时面板打开，但用户仍可点击按钮手动收起：
+```tsx
+<AppShell
+  sidebar={<FileTree />}
+  rightPanel={<AICopilot />}
+  bottomPanel={<Terminal />}
+  bottomPanelLayout="center"
+>
+  <EditorArea />
+</AppShell>
+```
+
+#### 受控模式
 
 ```tsx
 const [panelOpen, setPanelOpen] = useState(false);
 
-// 选中项变化时同步打开面板
-useEffect(() => {
-  if (selectedItem) setPanelOpen(true);
-}, [selectedItem]);
-
 <AppShell
-  sidebar={<MainNav />}
-  rightPanel={<Inspector item={selectedItem} />}
-  rightPanelOpen={panelOpen}
-  onRightPanelOpenChange={setPanelOpen}   // 按钮点击 → 这里被调用 → 状态更新
+  bottomPanel={<CommandOutput />}
+  bottomPanelOpen={panelOpen}
+  onBottomPanelOpenChange={setPanelOpen}
+  bottomPanelToggle={false}
+  defaultBottomPanelHeight={160}
 >
-  <ItemList />
+  <Canvas />
 </AppShell>
 ```
 
-#### 场景三：非受控（默认行为，向后兼容）
+### 状态栏（Status Bar）
 
-不传 `rightPanelOpen`，行为与之前完全一致：
+固定 24px 的信息展示栏。
+
+#### full 模式（默认）—— 横跨窗口 100% 宽度
 
 ```tsx
 <AppShell
-  sidebar={<LeftSidebar />}
-  rightPanel={<RightPanel />}
-  defaultRightPanelOpen={true}   // 仅控制初始状态
+  sidebar={<Nav />}
+  statusBar={
+    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+      <div>git: main</div>
+      <div>Ln 42, Col 8</div>
+    </div>
+  }
 >
-  <main>主内容</main>
+  <Editor />
+</AppShell>
+```
+
+#### workbench 模式 —— 仅覆盖 Main + RightPanel，Sidebar 全高
+
+```tsx
+<AppShell
+  sidebar={<FileTree />}
+  rightPanel={<AICopilot />}
+  statusBarLayout="workbench"
+  statusBar={<StatusInfo />}
+>
+  <Canvas />
 </AppShell>
 ```
 
@@ -355,15 +385,21 @@ useEffect(() => {
 | `children`               | `ReactNode`         | 必填          | 主内容区                                            |
 | `sidebar`                | `ReactNode`         | —           | 左侧边栏；不传则不渲染                                     |
 | `rightPanel`             | `ReactNode`         | —           | 右侧面板；不传则不渲染                                     |
+| `bottomPanel`            | `ReactNode`         | —           | 底部面板；不传则不渲染                                     |
+| `statusBar`              | `ReactNode`         | —           | 状态栏；不传则不渲染                                       |
 | `sidebarToggle`          | `ReactNode \| false` | `undefined` | `undefined` 有 sidebar 时显示默认按钮；`false` 隐藏；传节点则替换 |
 | `rightPanelToggle`       | `ReactNode \| false` | `undefined` | 同上，控制右侧面板切换按钮                                   |
+| `bottomPanelToggle`      | `ReactNode \| false` | `undefined` | 同上，控制底部面板切换按钮                                   |
 | `titlebarLeft`           | `ReactNode`         | —           | 标题栏左侧额外内容（sidebarToggle 之后）                     |
 | `titlebarCenter`         | `ReactNode`         | —           | 标题栏中间（可拖拽区域内）                                   |
 | `titlebarRight`          | `ReactNode`         | —           | 标题栏右侧额外内容（rightPanelToggle 之前）                  |
 | `defaultSidebarOpen`        | `boolean`                | `true`      | 侧边栏初始展开状态                                                  |
-| `rightPanelOpen`            | `boolean`                | —           | **受控**：右侧面板展开状态；传入后由调用方管理，AppShell 不再维护内部状态               |
-| `defaultRightPanelOpen`     | `boolean`                | `true`      | **非受控**：右侧面板初始展开状态（`rightPanelOpen` 未传时生效）                |
-| `onRightPanelOpenChange`    | `(open: boolean) => void` | —           | 受控模式下面板开关变化时的回调；非受控模式下按钮点击同样会触发，可用于监听 |
+| `rightPanelOpen`            | `boolean`                | —           | **受控**：右侧面板展开状态；传入后由调用方管理               |
+| `defaultRightPanelOpen`     | `boolean`                | `true`      | **非受控**：右侧面板初始展开状态                |
+| `onRightPanelOpenChange`    | `(open: boolean) => void` | —           | 右侧面板开关变化时的回调 |
+| `bottomPanelOpen`           | `boolean`                | —           | **受控**：底部面板展开状态；传入后由调用方管理               |
+| `defaultBottomPanelOpen`    | `boolean`                | `true`      | **非受控**：底部面板初始展开状态                |
+| `onBottomPanelOpenChange`   | `(open: boolean) => void` | —           | 底部面板开关变化时的回调 |
 | `defaultSidebarWidth`    | `number`            | `220`       | 侧边栏初始宽度（px）                                     |
 | `sidebarMinWidth`        | `number`            | `140`       | 侧边栏拖拽最小宽度（px）                                   |
 | `sidebarMaxWidth`        | `number`            | `480`       | 侧边栏拖拽最大宽度（px）                                   |
@@ -373,6 +409,11 @@ useEffect(() => {
 | `defaultRightPanelWidth` | `number`            | `260`       | 右侧面板初始宽度（px）                                    |
 | `rightPanelMinWidth`     | `number`            | `160`       | 右侧面板拖拽最小宽度（px）                                  |
 | `rightPanelMaxWidth`     | `number`            | `520`       | 右侧面板拖拽最大宽度（px）                                  |
+| `defaultBottomPanelHeight` | `number`           | `200`       | 底部面板初始高度（px）                                    |
+| `bottomPanelMinHeight`   | `number`            | `100`       | 底部面板拖拽最小高度（px）                                  |
+| `bottomPanelMaxHeight`   | `number`            | `600`       | 底部面板拖拽最大高度（px）                                  |
+| `bottomPanelLayout`      | `'wide' \| 'center'` | `'wide'`   | 底部面板布局：`wide` 横跨 Main+RightPanel；`center` 仅 Main 下方 |
+| `statusBarLayout`        | `'full' \| 'workbench'` | `'full'`   | 状态栏布局：`full` 横跨窗口；`workbench` 仅 Main+RightPanel |
 
 
 ---
@@ -395,6 +436,14 @@ useEffect(() => {
   --shell-icon-color:         #3a3a3a;  /* 标题栏图标色 */
   --shell-icon-hover-bg:      rgba(0, 0, 0, 0.10); /* 图标悬停背景 */
   --shell-transition:         0.22s ease;
+  /* 底部面板 / 状态栏 */
+  --shell-bottom-panel-height: 200px;   /* 底部面板高度（拖拽时自动更新） */
+  --shell-bottom-panel-bg:    #ffffff;  /* 底部面板背景色 */
+  --shell-bottom-panel-color: #1a1a1a;  /* 底部面板文字色 */
+  --shell-statusbar-height:   24px;     /* 状态栏高度 */
+  --shell-statusbar-bg:       #f3f3f3;  /* 状态栏背景色 */
+  --shell-statusbar-color:    #5a5a5a;  /* 状态栏文字色 */
+  --shell-statusbar-border-color: rgba(0, 0, 0, 0.08); /* 状态栏上边框色 */
   /* 默认无圆角/阴影（适合 Tauri 全屏窗口）；需要浮动卡片效果时启用： */
   /* --shell-radius: 12px; */
   /* --shell-shadow: 0 20px 60px rgba(0, 0, 0, 0.25); */
@@ -405,7 +454,7 @@ useEffect(() => {
 
 ## 发版（维护者）
 
-使用内置发版脚本，自动完成：更新 `package.json` 版本号 → 构建 → commit → 打 Tag → 推送。
+使用内置发版脚本，自动完成：更新 `package.json` 版本号 → 构建 → commit → 打 Tag → 推送 Git → 发布到 npm。
 
 ```bash
 # 格式：pnpm release <版本号>
@@ -421,14 +470,10 @@ pnpm release 0.2.0
 发版成功后，其他项目执行以下命令升级：
 
 ```bash
-# 方式一：锁定版本（推荐）
-pnpm add git+https://github.com/MengHuanLanYu/tauri-app-shell.git#v0.2.0
-
-# 方式二：修改 package.json 中的版本后执行
-pnpm install
+pnpm add tauri-app-shell@0.2.0
 ```
 
-> **注意**：`#v0.1.0` 是 Git Tag，不是分支。必须通过发版脚本或手动 `git tag` 后才能使用指定版本安装。
+> **注意**：首次发布前请确保已登录 npm（`npm login`）。
 
 ---
 
